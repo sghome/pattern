@@ -9,12 +9,14 @@
     <!-- Incluir la biblioteca Tone.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.26/Tone.js"></script>
 </head>
-<body>
-    <h1>Análisis de Patrones de Chladni desde MIDI</h1>
+<body style="background-color: black;">
+    <h1 style="color: white;">Análisis de Patrones de Chladni desde MIDI</h1>
     <!-- Crear un botón para cargar y analizar el archivo MIDI -->
     <button onclick="startAnalysis()">Cargar y Analizar MIDI</button>
     <!-- Crear un lienzo donde se dibujarán los patrones -->
-    <div id="canvas-container"></div>
+    <div id="canvas-container" style="float: left;"></div>
+    <!-- Mostrar la frecuencia y el nombre de la nota -->
+    <div id="info" style="float: right; color: white; margin-right: 50px;"></div>
 
     <script>
         // Variables globales para el lienzo y las frecuencias
@@ -30,6 +32,14 @@
             audioSetup('https://sghome.github.io/mp3/go.mp3');
             // Cargar y analizar el archivo MIDI después de un corto retraso para asegurarse de que el contexto de audio se inicie
             setTimeout(loadAndAnalyzeMIDI, 100);
+        }
+
+        // Función para configurar el audio y cargar el archivo MP3
+        function audioSetup(mp3URL) {
+            // Crear un objeto Audio
+            let audio = new Audio(mp3URL);
+            // Reproducir el audio (opcional)
+            audio.play();
         }
 
         // Función para cargar y analizar el archivo MIDI
@@ -50,19 +60,11 @@
             );
         }
 
-        // Función para configurar el audio y cargar el archivo MP3
-        function audioSetup(mp3URL) {
-            // Crear un objeto Audio
-            let audio = new Audio(mp3URL);
-            // Reproducir el audio (opcional)
-            audio.play();
-        }
-
         // Función para generar y visualizar los patrones de Chladni en cada fotograma
         function drawChladniPatterns() {
             // Limpiar el lienzo en cada fotograma
             clear();
-            
+
             // Lógica para generar y visualizar los patrones de Chladni
             let numNotes = frequencies.length;
             let margin = 20;
@@ -79,6 +81,11 @@
                 let colorIndex = i % colors.length; // Obtener un índice de color dentro del rango de colores disponibles
                 fill(colors[colorIndex]); // Establecer el color de relleno
                 ellipse(x, y, 10, 10); // Dibujar un círculo en la posición calculada
+                // Mostrar la frecuencia y el nombre de la nota asociada
+                let freqText = frequencies[i].toFixed(2) + " Hz";
+                let noteText = Tone.Frequency(frequencies[i], "midi").toNote();
+                let infoText = freqText + " (" + noteText + ")";
+                document.getElementById("info").innerHTML += infoText + "<br>";
             }
             
             // Solicitar el próximo fotograma de animación
