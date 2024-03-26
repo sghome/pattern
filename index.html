@@ -9,10 +9,8 @@
     <!-- Incluir la biblioteca Tone.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.26/Tone.js"></script>
 </head>
-<body style="background-color: black;">
+<body style="background-color: black;" onclick="startAudio()">
     <h1 style="color: white;">Análisis de Patrones de Chladni desde MIDI</h1>
-    <!-- Crear un botón para cargar y analizar el archivo MIDI -->
-    <button onclick="startAnalysis()">Cargar y Analizar MIDI</button>
     <!-- Crear un lienzo donde se dibujarán los patrones -->
     <div id="canvas-container" style="float: left;"></div>
     <!-- Mostrar la frecuencia y el nombre de la nota -->
@@ -26,25 +24,18 @@
         // Arreglo de colores para los patrones Chladni
         let colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
 
-        // Función para iniciar el análisis después de la interacción del usuario
-        function startAnalysis() {
+        // Función para iniciar la reproducción de audio y cargar y analizar el archivo MIDI
+        async function startAudio() {
             // Iniciar el contexto de audio después de la interacción del usuario
-            Tone.start();
-            loadAndAnalyzeMIDI();
+            await Tone.start();
+            // Cargar y analizar el archivo MIDI
+            await loadAndAnalyzeMIDI();
         }
 
         // Función para cargar y analizar el archivo MIDI
         async function loadAndAnalyzeMIDI() {
             // Cargar el archivo MIDI
             await loadAndProcessMidi('https://sghome.github.io/mp3/go.mid');
-
-            // Obtener las notas y frecuencias del archivo MIDI
-            let midiData = player.toMidi(player.buffer.toArray()[0]);
-            let notes = midiData.map(event => Tone.Frequency(event.note, "midi").toFrequency());
-
-            // Asignar las frecuencias al arreglo de frecuencias
-            frequencies = notes;
-
             // Generar y visualizar los patrones de Chladni
             drawChladniPatterns();
         }
@@ -98,14 +89,14 @@
             player.autostart = true;
         }
 
-        // Función para inicializar el audio cuando se hace clic en el documento
-        document.body.addEventListener('click', initAudio);
-
+        // Función para inicializar el audio automáticamente al cargar la página
         async function initAudio() {
             await loadAndProcessMidi('https://sghome.github.io/mp3/go.mid');
             audioSetup('https://sghome.github.io/mp3/go.mp3');
-            document.body.removeEventListener('click', initAudio);
         }
+
+        // Llamar a la función de inicialización del audio al cargar la página
+        initAudio();
     </script>
 </body>
 </html>
