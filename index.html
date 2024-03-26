@@ -28,8 +28,6 @@
 
         // Función para cargar y analizar el archivo MIDI después de una interacción del usuario
         function startAnalysis() {
-            // Configurar el audio y cargar el archivo MP3
-            audioSetup('https://sghome.github.io/mp3/go.mp3');
             // Cargar y analizar el archivo MIDI después de un corto retraso para asegurarse de que el contexto de audio se inicie
             setTimeout(loadAndAnalyzeMIDI, 100);
         }
@@ -44,20 +42,14 @@
 
         // Función para cargar y analizar el archivo MIDI
         function loadAndAnalyzeMIDI() {
-            // Cargar el archivo MIDI desde la URL
-            MIDI.Player.loadFile(
-                "https://sghome.github.io/mp3/go.mid",
-                function() {
-                    // Obtener las notas y frecuencias del archivo MIDI
-                    let notes = MIDI.Player.getSongNotes();
-                    frequencies = notes.map(note => Tone.Frequency(note).toFrequency());
+            // Obtener las notas y frecuencias del archivo MIDI
+            let notes = Tone.Midi("C4").toFrequency();
+            frequencies = [notes];
 
-                    // Iniciar el lienzo P5.js
-                    canvas = createCanvas(800, 600);
-                    // Generar y visualizar los patrones de Chladni en cada fotograma
-                    drawChladniPatterns();
-                }
-            );
+            // Iniciar el lienzo P5.js
+            canvas = createCanvas(800, 600);
+            // Generar y visualizar los patrones de Chladni en cada fotograma
+            drawChladniPatterns();
         }
 
         // Función para generar y visualizar los patrones de Chladni en cada fotograma
