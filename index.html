@@ -45,7 +45,13 @@
 
             // Cargar el archivo MIDI y extraer las notas
             player.load().then(function() {
-                frequencies = player.toMidi(player.buffer.toArray()[0]);
+                // Obtener las notas y frecuencias del archivo MIDI
+                let midiData = player.toMidi(player.buffer.toArray()[0]);
+                let notes = midiData.map(event => Tone.Frequency(event.note, "midi").toFrequency());
+
+                // Asignar las frecuencias al arreglo de frecuencias
+                frequencies = notes;
+
                 // Generar y visualizar los patrones de Chladni
                 drawChladniPatterns();
             }).catch(function(error) {
