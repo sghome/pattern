@@ -22,6 +22,7 @@
         // Variables globales para el lienzo y las frecuencias
         let canvas;
         let frequencies;
+        let mp3Player;
 
         // Arreglo de colores para los patrones Chladni
         let colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
@@ -38,7 +39,13 @@
         // Función para cargar y analizar el archivo MIDI
         function loadAndAnalyzeMIDI() {
             // Obtener las notas y frecuencias del archivo MIDI
-            let notes = Tone.Midi("C4").toFrequency();
+            let midiNote = "C4"; // Nota MIDI de referencia
+            let referenceFrequency = Tone.Midi(midiNote).toFrequency(); // Frecuencia de la nota de referencia
+            let targetReferenceFrequency = 432; // Frecuencia de referencia deseada (432 Hz)
+            let pitchRatio = targetReferenceFrequency / referenceFrequency; // Relación de cambio de tono
+
+            // Calcular y ajustar las frecuencias de las notas al nuevo tono
+            let notes = Tone.Midi(midiNote).toFrequency() * pitchRatio;
             frequencies = [notes];
 
             // Crear un lienzo P5.js
@@ -48,6 +55,11 @@
 
             // Generar y visualizar los patrones de Chladni en cada fotograma
             drawChladniPatterns();
+
+            // Crear el reproductor de MP3 y cargar la canción
+            mp3Player = new Tone.Player("tu_cancion.mp3").toDestination(); // Reemplaza "tu_cancion.mp3" con la URL de tu archivo MP3
+            mp3Player.playbackRate = pitchRatio; // Ajustar el pitch del reproductor MP3
+            mp3Player.autostart = true;
         }
 
         // Función para generar y visualizar los patrones de Chladni en cada fotograma
