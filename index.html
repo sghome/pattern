@@ -17,6 +17,13 @@
     <div id="canvas-container"></div>
 
     <script>
+        // Variables globales para el lienzo y las frecuencias
+        let canvas;
+        let frequencies;
+
+        // Arreglo de colores para los patrones Chladni
+        let colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
+
         // Función para cargar y analizar el archivo MIDI después de una interacción del usuario
         function startAnalysis() {
             // Configurar el audio y cargar el archivo MP3
@@ -33,10 +40,12 @@
                 function() {
                     // Obtener las notas y frecuencias del archivo MIDI
                     let notes = MIDI.Player.getSongNotes();
-                    let frequencies = notes.map(note => Tone.Frequency(note).toFrequency());
+                    frequencies = notes.map(note => Tone.Frequency(note).toFrequency());
 
-                    // Llamar a la función para generar los patrones de Chladni
-                    generateChladniPatterns(frequencies);
+                    // Iniciar el lienzo P5.js
+                    canvas = createCanvas(800, 600);
+                    // Generar y visualizar los patrones de Chladni en cada fotograma
+                    drawChladniPatterns();
                 }
             );
         }
@@ -49,40 +58,31 @@
             audio.play();
         }
 
-        // Función para generar los patrones de Chladni
-        function generateChladniPatterns(frequencies) {
-            // Definir el lienzo P5.js
-            let canvas;
+        // Función para generar y visualizar los patrones de Chladni en cada fotograma
+        function drawChladniPatterns() {
+            // Limpiar el lienzo en cada fotograma
+            clear();
+            
+            // Lógica para generar y visualizar los patrones de Chladni
+            let numNotes = frequencies.length;
+            let margin = 20;
+            let startX = margin;
+            let endX = width - margin;
+            let startY = margin;
+            let endY = height - margin;
+            let stepX = (endX - startX) / (numNotes - 1);
 
-            // Función de configuración inicial de P5.js
-            function setup() {
-                // Crear un lienzo P5.js
-                canvas = createCanvas(800, 600);
-                background(255);
-
-                // Generar y visualizar los patrones de Chladni
-                generateChladni(frequencies);
+            // Dibujar círculos según las frecuencias, asignando colores diferentes
+            for (let i = 0; i < numNotes; i++) {
+                let x = startX + i * stepX;
+                let y = map(frequencies[i], 0, 2000, endY, startY); // Ajusta los valores máximos y mínimos según tus necesidades
+                let colorIndex = i % colors.length; // Obtener un índice de color dentro del rango de colores disponibles
+                fill(colors[colorIndex]); // Establecer el color de relleno
+                ellipse(x, y, 10, 10); // Dibujar un círculo en la posición calculada
             }
-
-            // Función para generar y visualizar los patrones de Chladni
-            function generateChladni(frequencies) {
-                // Lógica para generar y visualizar los patrones de Chladni
-                // Utiliza P5.js para dibujar los patrones en el lienzo
-                let numNotes = frequencies.length;
-                let margin = 20;
-                let startX = margin;
-                let endX = width - margin;
-                let startY = margin;
-                let endY = height - margin;
-                let stepX = (endX - startX) / (numNotes - 1);
-
-                // Dibujar círculos según las frecuencias
-                for (let i = 0; i < numNotes; i++) {
-                    let x = startX + i * stepX;
-                    let y = map(frequencies[i], 0, 2000, endY, startY); // Ajusta los valores máximos y mínimos según tus necesidades
-                    ellipse(x, y, 10, 10); // Dibuja un círculo en la posición calculada
-                }
-            }
+            
+            // Solicitar el próximo fotograma de animación
+            requestAnimationFrame(drawChladniPatterns);
         }
     </script>
 </body>
