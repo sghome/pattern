@@ -26,7 +26,7 @@
         // Arreglo de colores para los patrones Chladni
         let colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
 
-        // Función para cargar y analizar el archivo MIDI después de una interacción del usuario
+        // Función para iniciar el análisis después de la interacción del usuario
         function startAnalysis() {
             // Iniciar el contexto de audio después de la interacción del usuario
             Tone.start();
@@ -43,18 +43,14 @@
             // Ajustar la frecuencia de reproducción a 432 Hz
             player.playbackRate = 432 / 440;
 
-            // Obtener las notas y frecuencias del archivo MIDI
-            player.get("midi").then(function(midi) {
-                frequencies = midi.notes.map(note => Tone.Frequency(note.name).toFrequency());
+            // Cargar el archivo MIDI y extraer las notas
+            player.load().then(function() {
+                frequencies = player.toMidi(player.buffer.toArray()[0]);
+                // Generar y visualizar los patrones de Chladni
+                drawChladniPatterns();
+            }).catch(function(error) {
+                console.error("Error al cargar el archivo MIDI:", error);
             });
-
-            // Crear un lienzo P5.js
-            canvas = createCanvas(800, 600);
-            // Adjuntar el lienzo al contenedor
-            canvas.parent('canvas-container');
-
-            // Generar y visualizar los patrones de Chladni en cada fotograma
-            drawChladniPatterns();
         }
 
         // Función para generar y visualizar los patrones de Chladni en cada fotograma
