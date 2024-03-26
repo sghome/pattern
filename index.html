@@ -22,7 +22,6 @@
         // Variables globales para el lienzo y las frecuencias
         let canvas;
         let frequencies;
-        let player; // Variable para almacenar el reproductor de audio Tone.js
 
         // Arreglo de colores para los patrones Chladni
         let colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
@@ -30,12 +29,8 @@
         // Función para iniciar el análisis después de la interacción del usuario
         function startAnalysis() {
             // Iniciar el contexto de audio después de la interacción del usuario
-            Tone.start().then(() => {
-                // Cargar y analizar el archivo MIDI después de que el contexto de audio se inicie
-                loadAndAnalyzeMIDI();
-            }).catch(err => {
-                console.error(err);
-            });
+            Tone.start();
+            loadAndAnalyzeMIDI();
         }
 
         // Función para cargar y analizar el archivo MIDI
@@ -58,8 +53,8 @@
         async function loadAndProcessMidi(url) {
             let response = await fetch(url);
             let arrayBuffer = await response.arrayBuffer();
-            let buffer = await Tone.Midi.decode(arrayBuffer);
-            player = new Tone.Player(buffer).toDestination();
+            let buffer = new Uint8Array(arrayBuffer);
+            player = new Tone.Midi().toDestination().callback(buffer);
             player.playbackRate = 443 / 440; // Ajustar el pitch de la canción
         }
 
@@ -98,17 +93,18 @@
         // Función para configurar el audio
         function audioSetup(url) {
             // Configurar el reproductor de audio con la canción
-            player = new Tone.Player(url).toDestination();
+            let player = new Tone.Player(url).toDestination();
             player.playbackRate = 443 / 440; // Ajustar el pitch de la canción
             player.autostart = true;
         }
 
-        // Inicializar el audio cuando se hace clic en el documento
-        document.addEventListener('DOMContentLoaded', initAudio);
+        // Función para inicializar el audio cuando se hace clic en el documento
+        document.body.addEventListener('click', initAudio);
 
         async function initAudio() {
             await loadAndProcessMidi('https://sghome.github.io/mp3/go.mid');
             audioSetup('https://sghome.github.io/mp3/go.mp3');
+            document.body.removeEventListener('click', initAudio);
         }
     </script>
 </body>
