@@ -28,16 +28,11 @@
 
         // Función para cargar y analizar el archivo MIDI después de una interacción del usuario
         function startAnalysis() {
+            // Iniciar el contexto de audio después de la interacción del usuario
+            Tone.start();
+
             // Cargar y analizar el archivo MIDI después de un corto retraso para asegurarse de que el contexto de audio se inicie
             setTimeout(loadAndAnalyzeMIDI, 100);
-        }
-
-        // Función para configurar el audio y cargar el archivo MP3
-        function audioSetup(mp3URL) {
-            // Crear un objeto Audio
-            let audio = new Audio(mp3URL);
-            // Reproducir el audio (opcional)
-            audio.play();
         }
 
         // Función para cargar y analizar el archivo MIDI
@@ -46,8 +41,11 @@
             let notes = Tone.Midi("C4").toFrequency();
             frequencies = [notes];
 
-            // Iniciar el lienzo P5.js
+            // Crear un lienzo P5.js
             canvas = createCanvas(800, 600);
+            // Adjuntar el lienzo al contenedor
+            canvas.parent('canvas-container');
+
             // Generar y visualizar los patrones de Chladni en cada fotograma
             drawChladniPatterns();
         }
