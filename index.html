@@ -19,7 +19,10 @@
     <script>
         // Función para cargar y analizar el archivo MIDI después de una interacción del usuario
         function startAnalysis() {
-            loadAndAnalyzeMIDI();
+            // Configurar el audio y cargar el archivo MP3
+            audioSetup('https://sghome.github.io/mp3/go.mp3');
+            // Cargar y analizar el archivo MIDI después de un corto retraso para asegurarse de que el contexto de audio se inicie
+            setTimeout(loadAndAnalyzeMIDI, 100);
         }
 
         // Función para cargar y analizar el archivo MIDI
@@ -36,10 +39,6 @@
                     generateChladniPatterns(frequencies);
                 }
             );
-
-            // Configurar el audio y cargar el archivo MP3
-            audioSetup('https://sghome.github.io/mp3/go.mp3');
-            document.body.removeEventListener('click', initAudio);
         }
 
         // Función para configurar el audio y cargar el archivo MP3
