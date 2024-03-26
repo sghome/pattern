@@ -36,27 +36,28 @@
         }
 
         // Función para cargar y analizar el archivo MIDI
-        function loadAndAnalyzeMIDI() {
-            // Crear un reproductor MIDI
-            let player = new Tone.Player("ruta_de_tu_archivo_midi.mid").toDestination();
+        async function loadAndAnalyzeMIDI() {
+            // Cargar el archivo MIDI
+            await loadAndProcessMidi('https://sghome.github.io/mp3/go.mid');
 
-            // Ajustar la frecuencia de reproducción a 432 Hz
-            player.playbackRate = 432 / 440;
+            // Obtener las notas y frecuencias del archivo MIDI
+            let midiData = player.toMidi(player.buffer.toArray()[0]);
+            let notes = midiData.map(event => Tone.Frequency(event.note, "midi").toFrequency());
 
-            // Cargar el archivo MIDI y extraer las notas
-            player.load().then(function() {
-                // Obtener las notas y frecuencias del archivo MIDI
-                let midiData = player.toMidi(player.buffer.toArray()[0]);
-                let notes = midiData.map(event => Tone.Frequency(event.note, "midi").toFrequency());
+            // Asignar las frecuencias al arreglo de frecuencias
+            frequencies = notes;
 
-                // Asignar las frecuencias al arreglo de frecuencias
-                frequencies = notes;
+            // Generar y visualizar los patrones de Chladni
+            drawChladniPatterns();
+        }
 
-                // Generar y visualizar los patrones de Chladni
-                drawChladniPatterns();
-            }).catch(function(error) {
-                console.error("Error al cargar el archivo MIDI:", error);
-            });
+        // Función para cargar y procesar el archivo MIDI
+        async function loadAndProcessMidi(url) {
+            let response = await fetch(url);
+            let arrayBuffer = await response.arrayBuffer();
+            let buffer = await Tone.Midi.decode(arrayBuffer);
+            player = new Tone.Player(buffer).toDestination();
+            player.playbackRate = 443 / 440; // Ajustar el pitch de la canción
         }
 
         // Función para generar y visualizar los patrones de Chladni en cada fotograma
@@ -89,6 +90,23 @@
             
             // Solicitar el próximo fotograma de animación
             requestAnimationFrame(drawChladniPatterns);
+        }
+
+        // Función para configurar el audio
+        function audioSetup(url) {
+            // Configurar el reproductor de audio con la canción
+            let player = new Tone.Player(url).toDestination();
+            player.playbackRate = 443 / 440; // Ajustar el pitch de la canción
+            player.autostart = true;
+        }
+
+        // Función para inicializar el audio cuando se hace clic en el documento
+        document.body.addEventListener('click', initAudio);
+
+        async function initAudio() {
+            await loadAndProcessMidi('https://sghome.github.io/mp3/go.mid');
+            audioSetup('https://sghome.github.io/mp3/go.mp3');
+            document.body.removeEventListener('click', initAudio);
         }
     </script>
 </body>
