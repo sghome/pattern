@@ -11,10 +11,17 @@
 </head>
 <body>
     <h1>Análisis de Patrones de Chladni desde MIDI</h1>
+    <!-- Crear un botón para cargar y analizar el archivo MIDI -->
+    <button onclick="startAnalysis()">Cargar y Analizar MIDI</button>
     <!-- Crear un lienzo donde se dibujarán los patrones -->
     <div id="canvas-container"></div>
 
     <script>
+        // Función para cargar y analizar el archivo MIDI después de una interacción del usuario
+        function startAnalysis() {
+            loadAndAnalyzeMIDI();
+        }
+
         // Función para cargar y analizar el archivo MIDI
         function loadAndAnalyzeMIDI() {
             // Cargar el archivo MIDI desde la URL
@@ -29,6 +36,18 @@
                     generateChladniPatterns(frequencies);
                 }
             );
+
+            // Configurar el audio y cargar el archivo MP3
+            audioSetup('https://sghome.github.io/mp3/go.mp3');
+            document.body.removeEventListener('click', initAudio);
+        }
+
+        // Función para configurar el audio y cargar el archivo MP3
+        function audioSetup(mp3URL) {
+            // Crear un objeto Audio
+            let audio = new Audio(mp3URL);
+            // Reproducir el audio (opcional)
+            audio.play();
         }
 
         // Función para generar los patrones de Chladni
@@ -66,10 +85,6 @@
                 }
             }
         }
-
-        // Llamar a la función para cargar y analizar el archivo MIDI
-        loadAndAnalyzeMIDI();
-
     </script>
 </body>
 </html>
