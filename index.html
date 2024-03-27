@@ -9,7 +9,7 @@
     <!-- Incluir la biblioteca Tone.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.26/Tone.js"></script>
 </head>
-<body style="background-color: black;" onclick="startAudio()">
+<body style="background-color: black;">
     <h1 style="color: white;">Análisis de Patrones de Chladni desde MIDI</h1>
     <!-- Crear un lienzo donde se dibujarán los patrones -->
     <div id="canvas-container" style="float: left;"></div>
@@ -19,14 +19,22 @@
     <script>
         // Variables globales para el lienzo y las frecuencias
         let canvas;
-        let frequencies;
+        let frequencies = [];
+        let notes = [
+            { note: 'F#m', beats: 37 },
+            { note: 'B', beats: 4 },
+            { note: 'B', beats: 7 },
+            { note: 'A', beats: 2 },
+            { note: 'B', beats: 4 },
+            { note: 'Abm', beats: 5 }
+        ];
 
         // Arreglo de colores para los patrones Chladni
         let colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
 
         // Función para iniciar la reproducción de audio y cargar y analizar el archivo MIDI
         async function startAudio() {
-            // Iniciar el contexto de audio después de la interacción del usuario
+            // Configurar el contexto de audio
             await Tone.start();
             // Cargar y analizar el archivo MIDI
             await loadAndAnalyzeMIDI();
@@ -34,7 +42,7 @@
 
         // Función para cargar y analizar el archivo MIDI
         async function loadAndAnalyzeMIDI() {
-            // Cargar el archivo MIDI
+            // Cargar y procesar el archivo MIDI
             await loadAndProcessMidi('https://sghome.github.io/mp3/go.mid');
             // Generar y visualizar los patrones de Chladni
             drawChladniPatterns();
@@ -45,15 +53,24 @@
             let response = await fetch(url);
             let arrayBuffer = await response.arrayBuffer();
             let buffer = new Uint8Array(arrayBuffer);
-            player = new Tone.Midi().toDestination().callback(buffer);
+            player = new Tone.Midi().callback(buffer);
             player.playbackRate = 443 / 440; // Ajustar el pitch de la canción
+            // Escuchar eventos de nota
+            player.on('note', (time, note) => {
+                console.log('Note:', note);
+                let frequency = Tone.Frequency(note, 'midi').toFrequency();
+                frequencies.push(frequency);
+            });
+            // Iniciar la reproducción
+            Tone.Transport.start();
+            // Detener la reproducción después de cierto tiempo (ajustar según sea necesario)
+            Tone.Transport.stop('+16n');
         }
 
         // Función para generar y visualizar los patrones de Chladni en cada fotograma
         function drawChladniPatterns() {
             // Limpiar el lienzo en cada fotograma
             clear();
-
             // Lógica para generar y visualizar los patrones de Chladni
             let numNotes = frequencies.length;
             let margin = 20;
@@ -76,27 +93,12 @@
                 let infoText = freqText + " (" + noteText + ")";
                 document.getElementById("info").innerHTML += infoText + "<br>";
             }
-            
-            // Solicitar el próximo fotograma de animación
-            requestAnimationFrame(drawChladniPatterns);
         }
 
-        // Función para configurar el audio
-        function audioSetup(url) {
-            // Configurar el reproductor de audio con la canción
-            let player = new Tone.Player(url).toDestination();
-            player.playbackRate = 443 / 440; // Ajustar el pitch de la canción
-            player.autostart = true;
-        }
-
-        // Función para inicializar el audio automáticamente al cargar la página
-        async function initAudio() {
-            await loadAndProcessMidi('https://sghome.github.io/mp3/go.mid');
-            audioSetup('https://cdn.glitch.global/764bc5af-2031-4a40-82a5-7a4337618c33/media-674193e0.mp3');
-        }
-
-        // Llamar a la función de inicialización del audio al cargar la página
-        initAudio();
+        // Llamar a la función de inicialización al cargar la página
+        startAudio();
     </script>
+    <!-- Incluir la canción de Gorillaz -->
+    <audio id="audio" src="https://cdn.glitch.global/764bc5af-2031-4a40-82a5-7a4337618c33/media-674193e0.mp3"></audio>
 </body>
 </html>
